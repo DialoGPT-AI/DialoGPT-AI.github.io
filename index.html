@@ -176,11 +176,6 @@
   function botReply(userText) {
     const lowText = userText.toLowerCase().trim();
 
-    // Răspunsuri noi adăugate după ce ai cerut
-    if (lowText.includes("ce e asta")) return "Este un AI.";
-    if (lowText.includes("cu ce ma poti ajuta")) return "Cu orice! Spune-mi ce vrei să știi și te ajut.";
-    if (lowText.includes("ajutor")) return "Sigur! Spune-mi cu ce te pot ajuta.";
-
     // Întrebări despre creator
     if (lowText.includes("cine") && lowText.includes("creator")) return "Creatorul meu este Azoitei Denis.";
     if (lowText.includes("cati ani") && lowText.includes("creator")) return "Creatorul are 11 ani.";
@@ -203,6 +198,26 @@
       if (lowText.includes("romana")) return "Spune-mi cerința și vedem împreună!";
       if (lowText.includes("istorie")) return "Cu ce eveniment sau perioadă te pot ajuta?";
       return "Spune-mi ce temă ai și îți răspund imediat!";
+    }
+
+    // Istorie — răspunsuri pentru întrebări istorice între anul 100 și prezent
+    if (lowText.includes("istoria") || lowText.includes("istorie") || lowText.includes("razboi") || lowText.includes("război")) {
+      if (lowText.includes("primul razboi mondial") || lowText.includes("primul război mondial")) {
+        return "Primul Război Mondial a avut loc între anii 1914 și 1918.";
+      }
+      if (lowText.includes("al doilea razboi mondial") || lowText.includes("al doilea război mondial")) {
+        return "Al Doilea Război Mondial a avut loc între anii 1939 și 1945.";
+      }
+      if (lowText.includes("unirea principatelor")) {
+        return "Unirea Principatelor Moldovei și Valahiei a avut loc în 1859.";
+      }
+      if (lowText.includes("revolutia romana") || lowText.includes("revoluția română")) {
+        return "Revoluția Română a avut loc în decembrie 1989.";
+      }
+      if (lowText.includes("domnia lui mihai viteazul")) {
+        return "Mihai Viteazul a domnit între 1593 și 1601.";
+      }
+      return "Spune-mi mai exact ce eveniment istoric te interesează între anul 100 și prezent.";
     }
 
     // Definiții
