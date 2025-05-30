@@ -16,6 +16,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
     }
 
     @keyframes gradient {
@@ -129,6 +130,56 @@
     #sendBtn:hover {
       background-color: #00c853;
     }
+
+    #historyBtn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background-color: #ffffff30;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      font-size: 1em;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #historyPanel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      max-width: 400px;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 999;
+    }
+
+    .conversation-item {
+      background-color: rgba(255,255,255,0.1);
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .backBtn {
+      margin-top: 20px;
+      background: #00e676;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      font-size: 1em;
+      border-radius: 10px;
+      cursor: pointer;
+      align-self: flex-start;
+    }
   </style>
 </head>
 <body>
@@ -138,9 +189,10 @@
   <p>AI</p>
 </header>
 
+<button id="historyBtn">📓 Istoric</button>
+<div id="historyPanel"></div>
+
 <button id="openChatBtn">Deschide AI</button>
-<button id="istoricBtn" style="position:fixed;top:20px;left:20px;background:#333;color:white;padding:8px;border:none;border-radius:8px;cursor:pointer;z-index:999;">🕓 Istoric</button>
-<div id="istoricList" style="display:none;position:fixed;top:60px;left:20px;background:#222;padding:10px;border-radius:10px;max-height:300px;overflow:auto;color:white;z-index:999;"></div>
 
 <div id="chatContainer">
   <div id="chatMessages"></div>
@@ -156,11 +208,21 @@
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
   const sendBtn = document.getElementById('sendBtn');
-  const istoricBtn = document.getElementById('istoricBtn');
-  const istoricList = document.getElementById('istoricList');
+  const historyBtn = document.getElementById('historyBtn');
+  const historyPanel = document.getElementById('historyPanel');
 
-  let conversatiiSalvate = JSON.parse(localStorage.getItem("conversatii") || "[]");
-  let indexConversatieCurenta = conversatiiSalvate.length;
+  let history = [];
+  let currentConversation = [];
+
+  openChatBtn.addEventListener('click', () => {
+    chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
+    if (chatContainer.style.display === 'flex') {
+      chatInput.focus();
+      openChatBtn.textContent = "Închide AI";
+    } else {
+      openChatBtn.textContent = "Deschide AI";
+    }
+  });
 
   function addMessage(text, sender) {
     const msg = document.createElement('div');
@@ -168,7 +230,7 @@
     msg.classList.add('message', sender);
     chatMessages.appendChild(msg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    salveazaConversatie(text, sender);
+    currentConversation.push({ text, sender });
   }
 
   function botReply(userText) {
@@ -184,17 +246,17 @@
       if (lowText.includes("dorohoi")) return "În Dorohoi e o zi frumoasă, cu soare și temperaturi de 20°C.";
       return "Nu știu locația exactă, dar sper că e frumos la tine!";
     }
+
     if (lowText.includes("tema") || lowText.includes("ajutor la") || lowText.includes("problema")) {
       if (lowText.includes("matematica")) return "Trimite-mi exercițiul și te ajut!";
       if (lowText.includes("romana")) return "Spune-mi cerința și vedem împreună!";
-      if (lowText.includes("istorie")) return "Cu ce eveniment sau perioadă te pot ajuta? (ex: când a început Primul Război Mondial?)";
+      if (lowText.includes("istorie")) return "Cu ce eveniment sau perioadă te pot ajuta?";
       return "Spune-mi ce temă ai și îți răspund imediat!";
     }
-    if (lowText.includes("primul razboi mondial")) return "Primul Război Mondial a început în 1914 și s-a terminat în 1918.";
-    if (lowText.includes("al doilea razboi mondial")) return "Al Doilea Război Mondial a avut loc între 1939 și 1945.";
+
     if (lowText.includes("definitie verb")) return "Un verb este partea de vorbire care exprimă o acțiune, o stare sau o existență.";
 
-    const expression = userText.replace(/x/gi, '*').replace(/,/g, '.').match(/^[\d\s\+\-\*\/\.]+$/);
+    const expression = userText.replace(/x/gi, '*').match(/^[\d\s\+\-\*\/\.]+$/);
     if (expression) {
       try {
         const result = eval(userText.replace(/x/gi, '*'));
@@ -207,52 +269,46 @@
     return "Hmm... nu am înțeles. Poți reformula întrebarea?";
   }
 
-  function salveazaConversatie(text, sender) {
-    if (!conversatiiSalvate[indexConversatieCurenta]) conversatiiSalvate[indexConversatieCurenta] = [];
-    conversatiiSalvate[indexConversatieCurenta].push({ text, sender });
-    localStorage.setItem("conversatii", JSON.stringify(conversatiiSalvate));
-  }
-
-  function incarcaConversatie(index) {
-    chatMessages.innerHTML = "";
-    indexConversatieCurenta = index;
-    conversatiiSalvate[index].forEach(msg => addMessage(msg.text, msg.sender));
-  }
-
-  istoricBtn.onclick = () => {
-    istoricList.innerHTML = "";
-    conversatiiSalvate.forEach((conv, i) => {
-      const preview = conv[0]?.text?.slice(0, 30) || "Conversație goală";
-      const item = document.createElement("div");
-      item.textContent = `#${i+1}: ${preview}`;
-      item.style.padding = "5px";
-      item.style.cursor = "pointer";
-      item.onclick = () => incarcaConversatie(i);
-      istoricList.appendChild(item);
-    });
-    istoricList.style.display = istoricList.style.display === "none" ? "block" : "none";
-  };
-
-  openChatBtn.addEventListener('click', () => {
-    chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
-    if (chatContainer.style.display === 'flex') {
-      chatInput.focus();
-      openChatBtn.textContent = "Închide AI";
-    } else {
-      openChatBtn.textContent = "Deschide AI";
-    }
-  });
-
   sendBtn.addEventListener('click', () => {
     const userText = chatInput.value.trim();
-    if (!userText) return;
+    if (userText === "") return;
     addMessage(userText, 'user');
     chatInput.value = '';
-    setTimeout(() => addMessage(botReply(userText), 'bot'), 600);
+    setTimeout(() => {
+      const reply = botReply(userText);
+      addMessage(reply, 'bot');
+    }, 600);
   });
 
-  chatInput.addEventListener('keypress', e => {
+  chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendBtn.click();
+  });
+
+  historyBtn.addEventListener('click', () => {
+    history.push([...currentConversation]);
+    currentConversation = [];
+
+    historyPanel.innerHTML = '<h3>📓 Istoric conversații</h3>';
+
+    history.forEach((conv, index) => {
+      const item = document.createElement('div');
+      item.classList.add('conversation-item');
+      item.textContent = `🔁 Conversația #${index + 1}`;
+      item.onclick = () => {
+        chatMessages.innerHTML = '';
+        conv.forEach(m => addMessage(m.text, m.sender));
+        historyPanel.style.display = 'none';
+      };
+      historyPanel.appendChild(item);
+    });
+
+    const backBtn = document.createElement('button');
+    backBtn.textContent = '🔙 Înapoi';
+    backBtn.className = 'backBtn';
+    backBtn.onclick = () => historyPanel.style.display = 'none';
+    historyPanel.appendChild(backBtn);
+
+    historyPanel.style.display = 'flex';
   });
 </script>
 
