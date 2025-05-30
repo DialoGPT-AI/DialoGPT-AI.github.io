@@ -176,6 +176,11 @@
   function botReply(userText) {
     const lowText = userText.toLowerCase().trim();
 
+    // Răspunsuri noi adăugate după ce ai cerut
+    if (lowText.includes("ce e asta")) return "Este un AI.";
+    if (lowText.includes("cu ce ma poti ajuta")) return "Cu orice! Spune-mi ce vrei să știi și te ajut.";
+    if (lowText.includes("ajutor")) return "Sigur! Spune-mi cu ce te pot ajuta.";
+
     // Întrebări despre creator
     if (lowText.includes("cine") && lowText.includes("creator")) return "Creatorul meu este Azoitei Denis.";
     if (lowText.includes("cati ani") && lowText.includes("creator")) return "Creatorul are 11 ani.";
