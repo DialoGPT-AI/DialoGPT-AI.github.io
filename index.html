@@ -55,7 +55,6 @@
       cursor: pointer;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       transition: background-color 0.3s ease;
-      z-index: 1000;
     }
 
     #openChatBtn:hover, #historyBtn:hover {
@@ -87,7 +86,6 @@
       backdrop-filter: blur(10px);
       box-shadow: 0 0 20px rgba(0,0,0,0.2);
       overflow: hidden;
-      z-index: 999;
     }
 
     #chatMessages {
@@ -128,12 +126,6 @@
       border: none;
       border-radius: 0 0 0 15px;
       font-size: 1em;
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-    }
-
-    #chatInput::placeholder {
-      color: #eee;
     }
 
     #sendBtn {
@@ -155,7 +147,6 @@
       padding: 10px;
       overflow-y: auto;
       color: white;
-      flex: 1;
     }
 
     .history-item {
@@ -166,11 +157,6 @@
       border-radius: 8px;
       margin-bottom: 5px;
       cursor: pointer;
-      align-items: center;
-    }
-
-    .history-item span {
-      flex: 1;
     }
 
     .renameBtn {
@@ -179,7 +165,6 @@
       color: white;
       cursor: pointer;
       font-size: 1em;
-      margin-left: 10px;
     }
   </style>
 </head>
@@ -196,7 +181,7 @@
 <div id="chatContainer">
   <div id="chatMessages"></div>
   <div id="chatInputContainer">
-    <input type="text" id="chatInput" placeholder="Scrie mesaj..." autocomplete="off"/>
+    <input type="text" id="chatInput" placeholder="Scrie mesaj..." />
     <button id="sendBtn">Trimite</button>
   </div>
 </div>
@@ -215,93 +200,66 @@
   const historyContainer = document.getElementById('historyContainer');
   const historyList = document.getElementById('historyList');
 
-  // Unic user, salvat in localStorage
-  const uniqueUserKey = 'user_' + (localStorage.getItem('unique_user') || Date.now());
-  localStorage.setItem('unique_user', uniqueUserKey);
-
-  // Istoric - obiect cu mai multe sesiuni/conversații
-  // Fiecare sesiune este un array de mesaje {text, sender}
-  // si poate avea si un nume (pentru redenumire)
-  let history = JSON.parse(localStorage.getItem(uniqueUserKey)) || {};
-
-  // Variabila ce tine sesiunea curenta (folosim timestamp initial)
   let currentSession = Date.now();
+  const userKey = 'user_' + (localStorage.getItem('unique_user') || Date.now());
+  localStorage.setItem('unique_user', userKey);
 
-  // Daca nu exista sesiunea curenta, o cream
-  if (!history[currentSession]) {
-    history[currentSession] = {
-      messages: [],
-      name: `Conversația ${Object.keys(history).length + 1}`
-    };
-  }
+  const history = JSON.parse(localStorage.getItem(userKey)) || {};
+  if (!history[currentSession]) history[currentSession] = [];
 
-  // Functie care afiseaza istoricul (lista conversatiilor)
+  openChatBtn.addEventListener('click', () => {
+    chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
+    historyContainer.style.display = 'none';
+    if (chatContainer.style.display === 'flex') {
+      chatInput.focus();
+      openChatBtn.textContent = "Închide AI";
+    } else {
+      openChatBtn.textContent = "Deschide AI";
+    }
+  });
+
+  historyBtn.addEventListener('click', () => {
+    historyContainer.style.display = historyContainer.style.display === 'flex' ? 'none' : 'flex';
+    chatContainer.style.display = 'none';
+    renderHistory();
+  });
+
   function renderHistory() {
     historyList.innerHTML = '';
-    Object.entries(history).forEach(([sessionKey, sessionData], index) => {
+    Object.entries(history).forEach(([key, messages], index) => {
+      const name = messages.name || `Conversația ${index + 1}`;
       const div = document.createElement('div');
       div.classList.add('history-item');
-      div.innerHTML = `
-        <span>${sessionData.name || `Conversația ${index + 1}`}</span>
-        <button class="renameBtn">✏️</button>
-      `;
-
-      div.querySelector('span').onclick = () => {
-        // La click pe nume, incarcam conversatia in chat
-        loadSession(sessionKey);
+      div.innerHTML = `<span>${name}</span><button class="renameBtn">✏️</button>`;
+      div.onclick = () => {
+        chatMessages.innerHTML = '';
+        messages.forEach(msg => addMessage(msg.text, msg.sender));
         chatContainer.style.display = 'flex';
         historyContainer.style.display = 'none';
-        openChatBtn.textContent = "Închide AI";
       };
-
       div.querySelector('.renameBtn').onclick = (e) => {
         e.stopPropagation();
-        const newName = prompt('Redenumește conversația:', sessionData.name || '');
-        if (newName && newName.trim() !== '') {
-          history[sessionKey].name = newName.trim();
-          saveHistory();
+        const newName = prompt('Redenumește conversația:');
+        if (newName) {
+          messages.name = newName;
+          localStorage.setItem(userKey, JSON.stringify(history));
           renderHistory();
         }
       };
-
       historyList.appendChild(div);
     });
   }
 
-  // Functie care incarca o sesiune in chat
-  function loadSession(sessionKey) {
-    currentSession = sessionKey;
-    chatMessages.innerHTML = '';
-    const messages = history[sessionKey].messages || [];
-    messages.forEach(msg => {
-      addMessage(msg.text, msg.sender, false);
-    });
-  }
-
-  // Functie pentru salvarea in localStorage
-  function saveHistory() {
-    localStorage.setItem(uniqueUserKey, JSON.stringify(history));
-  }
-
-  // Functie care adauga mesaj in chat si, optional, in istoric
-  // parametrul saveIntoHistory = true/false
-  // daca e false, doar afiseaza, fara a salva (util la incarcare istoric)
-  function addMessage(text, sender, saveIntoHistory = true) {
+  function addMessage(text, sender) {
     const msg = document.createElement('div');
     msg.textContent = text;
     msg.classList.add('message', sender);
     chatMessages.appendChild(msg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    if (saveIntoHistory) {
-      if (!history[currentSession]) {
-        history[currentSession] = { messages: [], name: `Conversația ${Object.keys(history).length + 1}` };
-      }
-      history[currentSession].messages.push({ text, sender });
-      saveHistory();
-    }
+    history[currentSession].push({ text, sender });
+    localStorage.setItem(userKey, JSON.stringify(history));
   }
 
-  // Functia AI (bot) care returneaza raspunsuri simple
   function botReply(userText) {
     const lowText = userText.toLowerCase().trim();
 
@@ -339,32 +297,6 @@
     return "Hmm... nu am înțeles. Poți reformula întrebarea?";
   }
 
-  // Eveniment la click pe butonul de deschidere/închidere AI
-  openChatBtn.addEventListener('click', () => {
-    if (chatContainer.style.display === 'flex') {
-      chatContainer.style.display = 'none';
-      openChatBtn.textContent = "Deschide AI";
-    } else {
-      chatContainer.style.display = 'flex';
-      historyContainer.style.display = 'none';
-      chatInput.focus();
-      openChatBtn.textContent = "Închide AI";
-    }
-  });
-
-  // Eveniment la click pe butonul de istoric
-  historyBtn.addEventListener('click', () => {
-    if (historyContainer.style.display === 'flex') {
-      historyContainer.style.display = 'none';
-    } else {
-      renderHistory();
-      historyContainer.style.display = 'flex';
-      chatContainer.style.display = 'none';
-      openChatBtn.textContent = "Deschide AI";
-    }
-  });
-
-  // Eveniment la trimitere mesaj
   sendBtn.addEventListener('click', () => {
     const userText = chatInput.value.trim();
     if (userText === "") return;
@@ -375,13 +307,11 @@
     }, 600);
   });
 
-  // Trimite mesaj la apasarea tastei Enter
   chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      sendBtn.click();
-    }
+    if (e.key === 'Enter') sendBtn.click();
   });
 </script>
 
 </body>
 </html>
+
