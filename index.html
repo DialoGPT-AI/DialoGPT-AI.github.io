@@ -1,135 +1,135 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DialoGPT Chat</title>
-<style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #ff6ec4, #7873f5, #4facfe, #43e97b);
-    background-size: 400% 400%;
-    animation: gradient 10s ease infinite;
-    color: white;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DialoGPT Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff6ec4, #7873f5, #4facfe, #43e97b);
+      background-size: 400% 400%;
+      animation: gradient 10s ease infinite;
+      color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-  @keyframes gradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-  header {
-    margin-top: 30px;
-    text-align: center;
-  }
+    header {
+      margin-top: 30px;
+      text-align: center;
+    }
 
-  header h1 {
-    font-size: 3.5em;
-    margin: 0;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-  }
+    header h1 {
+      font-size: 3.5em;
+      margin: 0;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    }
 
-  header p {
-    margin-top: 8px;
-    font-size: 1.4em;
-    font-weight: bold;
-    opacity: 0.9;
-  }
+    header p {
+      margin-top: 8px;
+      font-size: 1.4em;
+      font-weight: bold;
+      opacity: 0.9;
+    }
 
-  #openChatBtn {
-    position: fixed;
-    bottom: 30px;
-    background-color: #00e676;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.2em;
-    border-radius: 30px;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    transition: background-color 0.3s ease;
-  }
+    #openChatBtn {
+      position: fixed;
+      bottom: 30px;
+      background-color: #00e676;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: background-color 0.3s ease;
+    }
 
-  #openChatBtn:hover {
-    background-color: #00c853;
-  }
+    #openChatBtn:hover {
+      background-color: #00c853;
+    }
 
-  #chatContainer {
-    position: fixed;
-    bottom: 90px;
-    width: 90%;
-    max-width: 400px;
-    max-height: 500px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    display: none;
-    flex-direction: column;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  }
+    #chatContainer {
+      position: fixed;
+      bottom: 90px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 500px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      display: none;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
 
-  #chatMessages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-    font-size: 1em;
-  }
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      font-size: 1em;
+    }
 
-  .message {
-    margin-bottom: 10px;
-    padding: 8px 12px;
-    border-radius: 15px;
-    max-width: 80%;
-    word-wrap: break-word;
-  }
+    .message {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 15px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
 
-  .user {
-    background: #00e676;
-    align-self: flex-end;
-    color: white;
-  }
+    .user {
+      background: #00e676;
+      align-self: flex-end;
+      color: white;
+    }
 
-  .bot {
-    background: rgba(255, 255, 255, 0.3);
-    color: white;
-    align-self: flex-start;
-  }
+    .bot {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+      align-self: flex-start;
+    }
 
-  #chatInputContainer {
-    display: flex;
-    border-top: 1px solid rgba(255,255,255,0.3);
-  }
+    #chatInputContainer {
+      display: flex;
+      border-top: 1px solid rgba(255,255,255,0.3);
+    }
 
-  #chatInput {
-    flex: 1;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 0 0 0 15px;
-    font-size: 1em;
-  }
+    #chatInput {
+      flex: 1;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 0 0 0 15px;
+      font-size: 1em;
+    }
 
-  #sendBtn {
-    background-color: #00e676;
-    border: none;
-    color: white;
-    padding: 0 20px;
-    cursor: pointer;
-    border-radius: 0 0 15px 0;
-    font-size: 1.2em;
-    transition: background-color 0.3s ease;
-  }
+    #sendBtn {
+      background-color: #00e676;
+      border: none;
+      color: white;
+      padding: 0 20px;
+      cursor: pointer;
+      border-radius: 0 0 15px 0;
+      font-size: 1.2em;
+      transition: background-color 0.3s ease;
+    }
 
-  #sendBtn:hover {
-    background-color: #00c853;
-  }
-</style>
+    #sendBtn:hover {
+      background-color: #00c853;
+    }
+  </style>
 </head>
 <body>
 
@@ -157,7 +157,7 @@
 
   openChatBtn.addEventListener('click', () => {
     chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
-    if(chatContainer.style.display === 'flex') {
+    if (chatContainer.style.display === 'flex') {
       chatInput.focus();
       openChatBtn.textContent = "Închide AI";
     } else {
@@ -168,32 +168,58 @@
   function addMessage(text, sender) {
     const msg = document.createElement('div');
     msg.textContent = text;
-    msg.classList.add('message');
-    msg.classList.add(sender);
+    msg.classList.add('message', sender);
     chatMessages.appendChild(msg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
   function botReply(userText) {
     const lowText = userText.toLowerCase();
-    if(lowText.includes("salut")) return "Salut! Cu ce te pot ajuta azi?";
-    if(lowText.includes("cum esti")) return "Sunt bine, mulțumesc! Tu?";
-    if(lowText.includes("multumesc")) return "Cu drag!";
-    return "Hmm... nu am înțeles. Poți încerca altceva?";
+
+    // Conversație generală
+    if (lowText.includes("salut")) return "Salut! Cu ce te pot ajuta azi?";
+    if (lowText.includes("cum esti")) return "Sunt bine, mulțumesc! Tu?";
+    if (lowText.includes("multumesc")) return "Cu drag!";
+    if (lowText.includes("numele tau")) return "Sunt DialoGPT, AI-ul tău personal.";
+
+    // Vreme
+    if (lowText.includes("vreme")) {
+      if (lowText.includes("dorohoi")) return "În Dorohoi e o zi parțial înnorată, cu temperaturi de 20°C.";
+      return "Nu știu exact locația, dar sper că e vreme bună la tine!";
+    }
+
+    // Ajutor teme
+    if (lowText.includes("tema") || lowText.includes("ajutor la") || lowText.includes("problema")) {
+      if (lowText.includes("matematica")) return "Trimite-mi exercițiul și te ajut!";
+      if (lowText.includes("romana")) return "Spune-mi cerința și vedem împreună!";
+      if (lowText.includes("istorie")) return "Cu ce eveniment sau perioadă te pot ajuta?";
+      return "Spune-mi ce fel de temă ai și vedem!";
+    }
+
+    // Definiții de bază
+    if (lowText.includes("definitie verb")) return "Un verb este partea de vorbire care exprimă o acțiune, o stare sau o existență.";
+
+    // Calcul matematic (folosind eval cu atenție)
+    try {
+      const result = eval(userText);
+      if (!isNaN(result)) return `Rezultatul este: ${result}`;
+    } catch (e) {}
+
+    return "Hmm... nu am înțeles. Poți reformula întrebarea?";
   }
 
   sendBtn.addEventListener('click', () => {
     const userText = chatInput.value.trim();
-    if(userText === "") return;
+    if (userText === "") return;
     addMessage(userText, 'user');
     chatInput.value = '';
     setTimeout(() => {
       addMessage(botReply(userText), 'bot');
-    }, 800);
+    }, 600);
   });
 
   chatInput.addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') sendBtn.click();
+    if (e.key === 'Enter') sendBtn.click();
   });
 </script>
 
