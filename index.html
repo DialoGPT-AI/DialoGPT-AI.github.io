@@ -8,43 +8,59 @@
   body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #ff6ec4, #7873f5, #4facfe, #43e97b);
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
     color: white;
     height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
+
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
   header {
     margin-top: 30px;
     text-align: center;
   }
+
   header h1 {
-    font-size: 3em;
+    font-size: 3.5em;
     margin: 0;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
   }
+
   header p {
-    margin-top: 5px;
-    font-size: 1.3em;
-    opacity: 0.8;
+    margin-top: 8px;
+    font-size: 1.4em;
+    font-weight: bold;
+    opacity: 0.9;
   }
+
   #openChatBtn {
     position: fixed;
     bottom: 30px;
-    background-color: #28a745;
+    background-color: #00e676;
     color: white;
     border: none;
     padding: 15px 30px;
     font-size: 1.2em;
-    border-radius: 25px;
+    border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     transition: background-color 0.3s ease;
   }
+
   #openChatBtn:hover {
-    background-color: #218838;
+    background-color: #00c853;
   }
+
   #chatContainer {
     position: fixed;
     bottom: 90px;
@@ -58,12 +74,14 @@
     backdrop-filter: blur(10px);
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
   }
+
   #chatMessages {
     flex: 1;
     overflow-y: auto;
     padding: 15px;
     font-size: 1em;
   }
+
   .message {
     margin-bottom: 10px;
     padding: 8px 12px;
@@ -71,20 +89,24 @@
     max-width: 80%;
     word-wrap: break-word;
   }
+
   .user {
-    background: #28a745;
+    background: #00e676;
     align-self: flex-end;
     color: white;
   }
+
   .bot {
     background: rgba(255, 255, 255, 0.3);
     color: white;
     align-self: flex-start;
   }
+
   #chatInputContainer {
     display: flex;
     border-top: 1px solid rgba(255,255,255,0.3);
   }
+
   #chatInput {
     flex: 1;
     padding: 10px 15px;
@@ -92,8 +114,9 @@
     border-radius: 0 0 0 15px;
     font-size: 1em;
   }
+
   #sendBtn {
-    background-color: #28a745;
+    background-color: #00e676;
     border: none;
     color: white;
     padding: 0 20px;
@@ -102,8 +125,9 @@
     font-size: 1.2em;
     transition: background-color 0.3s ease;
   }
+
   #sendBtn:hover {
-    background-color: #218838;
+    background-color: #00c853;
   }
 </style>
 </head>
@@ -150,14 +174,12 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // Chat simplu simulare AI (poți înlocui cu backend real)
   function botReply(userText) {
-    // răspunsuri simple pentru demo
     const lowText = userText.toLowerCase();
     if(lowText.includes("salut")) return "Salut! Cu ce te pot ajuta azi?";
-    if(lowText.includes("cum esti")) return "Sunt un AI, mereu pregătit să răspund!";
-    if(lowText.includes("mulțumesc")) return "Cu plăcere!";
-    return "Îmi pare rău, nu am înțeles. Poți reformula?";
+    if(lowText.includes("cum esti")) return "Sunt bine, mulțumesc! Tu?";
+    if(lowText.includes("multumesc")) return "Cu drag!";
+    return "Hmm... nu am înțeles. Poți încerca altceva?";
   }
 
   sendBtn.addEventListener('click', () => {
@@ -171,9 +193,7 @@
   });
 
   chatInput.addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') {
-      sendBtn.click();
-    }
+    if(e.key === 'Enter') sendBtn.click();
   });
 </script>
 
