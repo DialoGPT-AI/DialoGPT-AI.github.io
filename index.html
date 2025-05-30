@@ -174,7 +174,11 @@
   }
 
   function botReply(userText) {
-    const lowText = userText.toLowerCase();
+    const lowText = userText.toLowerCase().trim();
+
+    // Întrebări despre creator
+    if (lowText.includes("cine") && lowText.includes("creator")) return "Creatorul meu este Azoitei Denis.";
+    if (lowText.includes("cati ani") && lowText.includes("creator")) return "Creatorul are 11 ani.";
 
     // Conversație generală
     if (lowText.includes("salut")) return "Salut! Cu ce te pot ajuta azi?";
@@ -184,26 +188,31 @@
 
     // Vreme
     if (lowText.includes("vreme")) {
-      if (lowText.includes("dorohoi")) return "În Dorohoi e o zi parțial înnorată, cu temperaturi de 20°C.";
-      return "Nu știu exact locația, dar sper că e vreme bună la tine!";
+      if (lowText.includes("dorohoi")) return "În Dorohoi e o zi frumoasă, cu soare și temperaturi de 20°C.";
+      return "Nu știu locația exactă, dar sper că e frumos la tine!";
     }
 
-    // Ajutor teme
+    // Ajutor la teme
     if (lowText.includes("tema") || lowText.includes("ajutor la") || lowText.includes("problema")) {
       if (lowText.includes("matematica")) return "Trimite-mi exercițiul și te ajut!";
       if (lowText.includes("romana")) return "Spune-mi cerința și vedem împreună!";
       if (lowText.includes("istorie")) return "Cu ce eveniment sau perioadă te pot ajuta?";
-      return "Spune-mi ce fel de temă ai și vedem!";
+      return "Spune-mi ce temă ai și îți răspund imediat!";
     }
 
-    // Definiții de bază
+    // Definiții
     if (lowText.includes("definitie verb")) return "Un verb este partea de vorbire care exprimă o acțiune, o stare sau o existență.";
 
-    // Calcul matematic (folosind eval cu atenție)
-    try {
-      const result = eval(userText);
-      if (!isNaN(result)) return `Rezultatul este: ${result}`;
-    } catch (e) {}
+    // Detectează și evaluează calcule cu + - x / și cifre între 1-1000
+    const expression = userText.replace(/x/gi, '*').replace(/,/g, '.').match(/^[\d\s\+\-\*\/\.]+$/);
+    if (expression) {
+      try {
+        const result = eval(userText.replace(/x/gi, '*'));
+        if (!isNaN(result)) return `Rezultatul este: ${result}`;
+      } catch (e) {
+        return "Nu am reușit să calculez. Verifică dacă ai scris corect.";
+      }
+    }
 
     return "Hmm... nu am înțeles. Poți reformula întrebarea?";
   }
