@@ -176,7 +176,7 @@
   function botReply(userText) {
     const lowText = userText.toLowerCase().trim();
 
-    // Întrebări despre creator
+    // Creator
     if (lowText.includes("cine") && lowText.includes("creator")) return "Creatorul meu este Azoitei Denis.";
     if (lowText.includes("cati ani") && lowText.includes("creator")) return "Creatorul are 11 ani.";
 
@@ -192,7 +192,11 @@
       return "Nu știu locația exactă, dar sper că e frumos la tine!";
     }
 
-    // Ajutor la teme
+    // Istorie
+    if (lowText.includes("cand a fost primul razboi mondial")) return "Primul Război Mondial a fost între 1914 și 1918.";
+    if (lowText.includes("cand a fost al doilea razboi mondial")) return "Al Doilea Război Mondial a avut loc între 1939 și 1945.";
+
+    // Teme
     if (lowText.includes("tema") || lowText.includes("ajutor la") || lowText.includes("problema")) {
       if (lowText.includes("matematica")) return "Trimite-mi exercițiul și te ajut!";
       if (lowText.includes("romana")) return "Spune-mi cerința și vedem împreună!";
@@ -200,30 +204,17 @@
       return "Spune-mi ce temă ai și îți răspund imediat!";
     }
 
-    // Istorie — răspunsuri pentru întrebări istorice între anul 100 și prezent
-    if (lowText.includes("istoria") || lowText.includes("istorie") || lowText.includes("razboi") || lowText.includes("război")) {
-      if (lowText.includes("primul razboi mondial") || lowText.includes("primul război mondial")) {
-        return "Primul Război Mondial a avut loc între anii 1914 și 1918.";
-      }
-      if (lowText.includes("al doilea razboi mondial") || lowText.includes("al doilea război mondial")) {
-        return "Al Doilea Război Mondial a avut loc între anii 1939 și 1945.";
-      }
-      if (lowText.includes("unirea principatelor")) {
-        return "Unirea Principatelor Moldovei și Valahiei a avut loc în 1859.";
-      }
-      if (lowText.includes("revolutia romana") || lowText.includes("revoluția română")) {
-        return "Revoluția Română a avut loc în decembrie 1989.";
-      }
-      if (lowText.includes("domnia lui mihai viteazul")) {
-        return "Mihai Viteazul a domnit între 1593 și 1601.";
-      }
-      return "Spune-mi mai exact ce eveniment istoric te interesează între anul 100 și prezent.";
-    }
+    // Limba română - Gramatică
+    if (lowText.includes("ce este un adjectiv")) return "Un adjectiv este partea de vorbire care determină un substantiv și exprimă o însușire a acestuia.";
+    if (lowText.includes("exemplu de adjectiv")) return "Exemplu: frumos, mare, mic, rapid.";
+    if (lowText.includes("ce este un substantiv")) return "Un substantiv este partea de vorbire care denumește ființe, lucruri, fenomene.";
+    if (lowText.includes("ce este un verb")) return "Un verb este partea de vorbire care exprimă o acțiune, o stare sau o existență.";
+    if (lowText.includes("sinonim") && lowText.includes("frumos")) return "Sinonime pentru „frumos”: atrăgător, plăcut, elegant.";
+    if (lowText.includes("antonim") && lowText.includes("înalt")) return "Antonimul cuvântului „înalt” este „scund”.";
+    if (lowText.includes("conjuga") && lowText.includes("a fi")) return "Eu sunt, tu ești, el/ea este, noi suntem, voi sunteți, ei/ele sunt.";
+    if (lowText.includes("se scrie") && (lowText.includes("ia") || lowText.includes("i-a"))) return "„Ia” e verb (ex: ia cartea), „i-a” e pronume + verb (i-a dat).";
 
-    // Definiții
-    if (lowText.includes("definitie verb")) return "Un verb este partea de vorbire care exprimă o acțiune, o stare sau o existență.";
-
-    // Detectează și evaluează calcule cu + - x / și cifre între 1-1000
+    // Calcule matematice simple
     const expression = userText.replace(/x/gi, '*').replace(/,/g, '.').match(/^[\d\s\+\-\*\/\.]+$/);
     if (expression) {
       try {
