@@ -129,45 +129,6 @@
     #sendBtn:hover {
       background-color: #00c853;
     }
-
-    /* 🖉 Buton creion sus stânga */
-    #historyBtn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background-color: #ffffff22;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 10px;
-      font-size: 1em;
-      cursor: pointer;
-      backdrop-filter: blur(5px);
-    }
-
-    #historyList {
-      position: fixed;
-      top: 60px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 10px;
-      padding: 10px;
-      display: none;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    #historyList div {
-      padding: 8px;
-      margin-bottom: 5px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #historyList div:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
   </style>
 </head>
 <body>
@@ -177,10 +138,9 @@
   <p>AI</p>
 </header>
 
-<button id="historyBtn">🖉</button>
-<div id="historyList"></div>
-
 <button id="openChatBtn">Deschide AI</button>
+<button id="istoricBtn" style="position:fixed;top:20px;left:20px;background:#333;color:white;padding:8px;border:none;border-radius:8px;cursor:pointer;z-index:999;">🕓 Istoric</button>
+<div id="istoricList" style="display:none;position:fixed;top:60px;left:20px;background:#222;padding:10px;border-radius:10px;max-height:300px;overflow:auto;color:white;z-index:999;"></div>
 
 <div id="chatContainer">
   <div id="chatMessages"></div>
@@ -196,25 +156,11 @@
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
   const sendBtn = document.getElementById('sendBtn');
-  const historyBtn = document.getElementById('historyBtn');
-  const historyList = document.getElementById('historyList');
+  const istoricBtn = document.getElementById('istoricBtn');
+  const istoricList = document.getElementById('istoricList');
 
-  let history = [];
-
-  openChatBtn.addEventListener('click', () => {
-    chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
-    if (chatContainer.style.display === 'flex') {
-      chatInput.focus();
-      openChatBtn.textContent = "Închide AI";
-    } else {
-      openChatBtn.textContent = "Deschide AI";
-    }
-  });
-
-  historyBtn.addEventListener('click', () => {
-    historyList.style.display = historyList.style.display === 'block' ? 'none' : 'block';
-    renderHistory();
-  });
+  let conversatiiSalvate = JSON.parse(localStorage.getItem("conversatii") || "[]");
+  let indexConversatieCurenta = conversatiiSalvate.length;
 
   function addMessage(text, sender) {
     const msg = document.createElement('div');
@@ -222,18 +168,33 @@
     msg.classList.add('message', sender);
     chatMessages.appendChild(msg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    salveazaConversatie(text, sender);
   }
 
   function botReply(userText) {
     const lowText = userText.toLowerCase().trim();
 
-    if (lowText.includes("creator")) return "Creatorul meu este Azoitei Denis.";
+    if (lowText.includes("cine") && lowText.includes("creator")) return "Creatorul meu este Azoitei Denis.";
+    if (lowText.includes("cati ani") && lowText.includes("creator")) return "Creatorul are 11 ani.";
     if (lowText.includes("salut")) return "Salut! Cu ce te pot ajuta azi?";
-    if (lowText.includes("adjectiv")) return "Adjectivul este partea de vorbire care determină un substantiv și arată o însușire a acestuia.";
-    if (lowText.includes("primul razboi mondial")) return "Primul Război Mondial a avut loc între 1914 și 1918.";
+    if (lowText.includes("cum esti")) return "Sunt bine, mulțumesc! Tu?";
+    if (lowText.includes("multumesc")) return "Cu drag!";
+    if (lowText.includes("numele tau")) return "Sunt DialoGPT, AI-ul tău personal.";
+    if (lowText.includes("vreme")) {
+      if (lowText.includes("dorohoi")) return "În Dorohoi e o zi frumoasă, cu soare și temperaturi de 20°C.";
+      return "Nu știu locația exactă, dar sper că e frumos la tine!";
+    }
+    if (lowText.includes("tema") || lowText.includes("ajutor la") || lowText.includes("problema")) {
+      if (lowText.includes("matematica")) return "Trimite-mi exercițiul și te ajut!";
+      if (lowText.includes("romana")) return "Spune-mi cerința și vedem împreună!";
+      if (lowText.includes("istorie")) return "Cu ce eveniment sau perioadă te pot ajuta? (ex: când a început Primul Război Mondial?)";
+      return "Spune-mi ce temă ai și îți răspund imediat!";
+    }
+    if (lowText.includes("primul razboi mondial")) return "Primul Război Mondial a început în 1914 și s-a terminat în 1918.";
     if (lowText.includes("al doilea razboi mondial")) return "Al Doilea Război Mondial a avut loc între 1939 și 1945.";
+    if (lowText.includes("definitie verb")) return "Un verb este partea de vorbire care exprimă o acțiune, o stare sau o existență.";
 
-    const expression = userText.replace(/x/gi, '*').match(/^[\d\s\+\-\*\/\.]+$/);
+    const expression = userText.replace(/x/gi, '*').replace(/,/g, '.').match(/^[\d\s\+\-\*\/\.]+$/);
     if (expression) {
       try {
         const result = eval(userText.replace(/x/gi, '*'));
@@ -246,42 +207,53 @@
     return "Hmm... nu am înțeles. Poți reformula întrebarea?";
   }
 
+  function salveazaConversatie(text, sender) {
+    if (!conversatiiSalvate[indexConversatieCurenta]) conversatiiSalvate[indexConversatieCurenta] = [];
+    conversatiiSalvate[indexConversatieCurenta].push({ text, sender });
+    localStorage.setItem("conversatii", JSON.stringify(conversatiiSalvate));
+  }
+
+  function incarcaConversatie(index) {
+    chatMessages.innerHTML = "";
+    indexConversatieCurenta = index;
+    conversatiiSalvate[index].forEach(msg => addMessage(msg.text, msg.sender));
+  }
+
+  istoricBtn.onclick = () => {
+    istoricList.innerHTML = "";
+    conversatiiSalvate.forEach((conv, i) => {
+      const preview = conv[0]?.text?.slice(0, 30) || "Conversație goală";
+      const item = document.createElement("div");
+      item.textContent = `#${i+1}: ${preview}`;
+      item.style.padding = "5px";
+      item.style.cursor = "pointer";
+      item.onclick = () => incarcaConversatie(i);
+      istoricList.appendChild(item);
+    });
+    istoricList.style.display = istoricList.style.display === "none" ? "block" : "none";
+  };
+
+  openChatBtn.addEventListener('click', () => {
+    chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
+    if (chatContainer.style.display === 'flex') {
+      chatInput.focus();
+      openChatBtn.textContent = "Închide AI";
+    } else {
+      openChatBtn.textContent = "Deschide AI";
+    }
+  });
+
   sendBtn.addEventListener('click', () => {
     const userText = chatInput.value.trim();
-    if (userText === "") return;
+    if (!userText) return;
     addMessage(userText, 'user');
-    history.push(userText);
     chatInput.value = '';
-    setTimeout(() => {
-      const reply = botReply(userText);
-      addMessage(reply, 'bot');
-      history.push(reply);
-    }, 600);
+    setTimeout(() => addMessage(botReply(userText), 'bot'), 600);
   });
 
-  chatInput.addEventListener('keypress', (e) => {
+  chatInput.addEventListener('keypress', e => {
     if (e.key === 'Enter') sendBtn.click();
   });
-
-  function renderHistory() {
-    historyList.innerHTML = "";
-    const grouped = [];
-    for (let i = 0; i < history.length; i += 2) {
-      grouped.push(history[i]);
-    }
-    grouped.forEach((msg, i) => {
-      const div = document.createElement('div');
-      div.textContent = `Conversație ${i + 1}: ${msg.slice(0, 30)}...`;
-      div.addEventListener('click', () => {
-        chatMessages.innerHTML = '';
-        addMessage(history[i * 2], 'user');
-        if (history[i * 2 + 1]) addMessage(history[i * 2 + 1], 'bot');
-        chatContainer.style.display = 'flex';
-        chatInput.focus();
-      });
-      historyList.appendChild(div);
-    });
-  }
 </script>
 
 </body>
